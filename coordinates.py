@@ -1,10 +1,6 @@
 from dataclasses import dataclass
 from subprocess import Popen, PIPE
-from urllib.request import urlopen
 from urllib.parse import urlparse
-import re
-
-
 
 import config
 from exceptions import CantGetCoordinates
@@ -63,6 +59,6 @@ def _round_coordinates(coordinates: Coordinates) -> Coordinates:
 
 
 if __name__ == '__main__':
-    location = get_gps_coordinates('https://ipinfo.io/loc')
+    location = get_gps_coordinates(config.COORDINATES_URL)
     print(location.latitude, location.longitude, sep='\n')
     # print(_check_url("https://ipinfo.io/loc"))
