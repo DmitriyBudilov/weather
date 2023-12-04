@@ -88,7 +88,7 @@ def _parse_weather_type(openweather_dict: dict) -> WeatherType:
 
 def _parse_sun_time(
     openweather_dict: dict,
-    time: Literal["sunrise"] | Literal["sunser"]) -> datetime:
+    time: Literal["sunrise"] | Literal["sunset"]) -> datetime:
     return datetime.fromtimestamp(openweather_dict["sys"][time])
 
 def _parse_city(openweather_dict: dict) -> str:
