@@ -1,11 +1,21 @@
 #!/usr/bin/env python3
-from coordinate import get_gps_coordinates
+from exceptions import ApiServiceError, CantGetCoordinates
+from coordinates import get_gps_coordinates
 from weather_api_service import get_weather
 from weather_formatter import format_weather
+from config import COORDINATES_URL
 
 def main():
-    coordinates = get_gps_coordinates()
-    weather = get_weather(coordinate)
+    try:
+        coordinates = get_gps_coordinates(COORDINATES_URL)
+    except CantGetCoordinates:
+        print("Нет возможности получить GPS-координаты!")
+        exit(1)
+    try:
+        weather = get_weather(coordinates)
+    except ApiServiceError:
+        print("Нет возможности получить погодные данные с сервера.")
+        exit(1)
     print(format_weather(weather))
 
 if __name__ == '__main__':
