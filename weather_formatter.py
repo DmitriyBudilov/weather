@@ -2,8 +2,10 @@ from weather_api_service import Weather
 
 def format_weather(weather: Weather) -> str:
     """Отформатировать погодные данные в строку."""
-    return (f"{weather.city}, температура {weather.temperature}⁰C, "
-            f"{weather.weather_type}\n"
+    return (f"\n***** {weather.sunrise.strftime('%A')} *****\n\n"
+            f"{weather.city}\n"
+            f"Температура: {weather.temperature}⁰C, "
+            f"{weather.weather_type.value}\n"
             f"Восход: {weather.sunrise.strftime('%H:%M')}\n"
             f"Закат: {weather.sunset.strftime('%H:%M')}\n")
 

@@ -21,6 +21,7 @@ class PlainFileWeatherStorage:
         self._file = file
     
     def save(self, weather: Weather) -> None:
+        """Сохранение погодных данных в TXT файл."""
         now = datetime.now()
         formatted_weather = format_weather(weather)
         with open(self._file, "a") as f:
@@ -33,6 +34,7 @@ class JSONFileWeatherStorage:
         self._init_storage()
 
     def save(self, weather: Weather) -> None:
+        """Сохранение погодных данных в JSON файл."""
         history = self._read_history()
         history.append(
             {
@@ -43,14 +45,17 @@ class JSONFileWeatherStorage:
         self._write(history)
     
     def _init_storage(self) -> None:
+        """Инициализировать файл хранилища JSON."""
         if not self._jsonfile.exists():
             self._jsonfile.write_text("[]")
         
     def _read_history(self) -> list[HistoryRecord]:
+        """Загрузить данные из файла хранилища JSON."""
         with open(self._jsonfile, "r") as f:
             return json.load(f)
 
     def _write(self, history: list[HistoryRecord]) -> None:
+        """Записать данные в файл ранилища JSON."""
         with open(self._jsonfile, "w") as f:
             json.dump(history, f, ensure_ascii=False, indent=4)
 

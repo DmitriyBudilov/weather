@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from subprocess import Popen, PIPE
+from urllib.request import urlopen
 from urllib.parse import urlparse
 
 import config
@@ -11,23 +12,27 @@ class Coordinates:
     longitude: float
 
 def get_gps_coordinates(url: str) -> Coordinates:
-    """Вернуть координаты устройства."""
+    """Возвращает координаты устройства."""
     _check_url(url)
     coordinates = _get_device_coordinate(url)
     return _round_coordinates(coordinates)
 
 def _check_url(url: str) -> bool:
+    """Проверяет url адресс."""
     result = urlparse(url)
     if not all([result.scheme, result.netloc]):
         raise CantGetCoordinates
     return True
 
 def _get_device_coordinate(url: str) -> Coordinates:
-    curl_output = _get_curl_output(url)
+    """Получает координаты устройства."""
+    # curl_output = _get_curl_output(url)
+    curl_output = _get_location_output(url)
     coordinates = _parse_coordinates(curl_output)
     return coordinates
 
 def _get_curl_output(url: str) -> bytes:
+    """Отправляет запрос через утилиту «curl», возвращает bytes."""
     process = Popen(["curl", url], stdout=PIPE)
     output, err = process.communicate()
     exit_code = process.wait()
@@ -35,7 +40,15 @@ def _get_curl_output(url: str) -> bytes:
         raise CantGetCoordinates
     return output
 
+def _get_location_output(url: str) -> bytes:
+    """Получает данные через urllib. Возвращает строку в bytes."""
+    response = urlopen(url)
+    if response.status != 200:
+        raise CantGetCoordinates
+    return response.read()
+
 def _parse_coordinates(curl_output: bytes) -> Coordinates:
+    """Парсит байтовую строку и возвращает Coordinate."""
     try:
         output = curl_output.decode().strip().split(',')
     except UnicodeDecodeError:
@@ -43,6 +56,7 @@ def _parse_coordinates(curl_output: bytes) -> Coordinates:
     return _converte_coordinates(output)
 
 def _converte_coordinates(output_line: list[str]) -> Coordinates:
+    """Конвертирует координаты из str во float, возвращает Coordinate."""
     try:
         latitude, longitude = map(float, output_line)
     except ValueError:
@@ -50,6 +64,7 @@ def _converte_coordinates(output_line: list[str]) -> Coordinates:
     return Coordinates(latitude, longitude)
 
 def _round_coordinates(coordinates: Coordinates) -> Coordinates:
+    """Округляет значения Coordinates."""
     if not config.USE_ROUNDED_COORDS:
         return coordinates
     return Coordinates(*map(
